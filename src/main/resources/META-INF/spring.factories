@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationAutoConfiguration

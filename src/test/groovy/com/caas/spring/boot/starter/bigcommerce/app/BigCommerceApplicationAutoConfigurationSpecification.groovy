@@ -1,19 +1,31 @@
 package com.caas.spring.boot.starter.bigcommerce.app
 
-import org.springframework.boot.autoconfigure.AutoConfigurations
-import org.springframework.boot.test.context.runner.ApplicationContextRunner
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.ApplicationContext
+import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
+@ActiveProfiles('config')
+@SpringBootTest(classes = BigCommerceApplicationAutoConfiguration)
 class BigCommerceApplicationAutoConfigurationSpecification extends Specification {
 
-    ApplicationContextRunner testObj
+    @Autowired
+    ApplicationContext context
 
-    void setup() {
-        testObj = new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(BigCommerceApplicationAutoConfiguration))
+    void 'spring context loads with spring boot starter bigcommerce app auto configuration'() {
+        expect:
+        context
     }
 
-    void 'verify context loads with spring boot starter bigcommerce app auto configuration'() {
+    void 'configuration for spring boot starter bigcommerce app loads'() {
+        given:
+        def configuration = context.getBean(BigCommerceApplicationConfiguration)
+
         expect:
-        testObj
+        configuration
+
+        and:
+        configuration.name
     }
 }

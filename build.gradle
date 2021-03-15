@@ -4,13 +4,11 @@ plugins {
     id 'groovy'
 }
 
-ext {
-    springBootVersion = '2.4.2'
-}
+apply from: "${rootDir}/version-info.gradle"
 
 group = 'com.caas'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '11'
 
 jar {
     manifest {
@@ -30,14 +28,19 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${project.ext.springBootVersion}")
     }
 }
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation "org.springframework.boot:spring-boot-starter-web"
 
     implementation 'org.springframework.boot:spring-boot'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
+
+    implementation "com.google.guava:guava:${project.ext.guavaVersion}"
+    implementation "com.auth0:java-jwt:${project.ext.jwtVersion}"
 
     compileOnly 'org.projectlombok:lombok'
 
@@ -53,6 +56,8 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+
+    testImplementation "com.github.tomakehurst:wiremock-jre8:${project.ext.wiremockVersion}"
 }
 
 test {

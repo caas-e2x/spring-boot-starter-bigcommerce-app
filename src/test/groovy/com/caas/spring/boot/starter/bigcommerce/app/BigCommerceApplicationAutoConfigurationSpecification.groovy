@@ -33,10 +33,9 @@ class BigCommerceApplicationAutoConfigurationSpecification extends Specification
 
         and:
         configuration.storeCredentials
-        configuration.storeCredentials['storeid']
-        configuration.storeCredentials['storeid'].key == 'a-store-key'
-        configuration.storeCredentials['storeid'].clientId == 'a-client-id'
-        configuration.storeCredentials['storeid'].clientSecret == 'a-client-secret'
+        configuration.storeCredentials['store-id']
+        configuration.storeCredentials['store-id'].clientId == 'a-client-id'
+        configuration.storeCredentials['store-id'].clientSecret == 'a-client-secret'
 
         and:
         configuration.httpClient.readTimeout == 10000

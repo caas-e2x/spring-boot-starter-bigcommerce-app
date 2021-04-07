@@ -9,8 +9,7 @@ caas:
     redirect-uri: 'https:/a/redirect/uri'
 
     store-credentials:
-      storeid:
-        key: a-store-key
+      store-id:
         client-id: a-client-id
         client-secret: a-client-secret
 

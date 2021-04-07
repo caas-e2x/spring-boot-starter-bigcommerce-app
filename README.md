@@ -1,8 +1,13 @@
 # BigCommerce Spring Boot Starter Module
-A spring boot starter module for BigCommerce third-party applications
- 
+
+A Spring Boot Starter module for BigCommerce third-party applications 
 
 [![Build](https://circleci.com/gh/caas-e2x/spring-boot-starter-bigcommerce-app.svg??style=shield)](https://app.circleci.com/pipelines/github/caas-e2x/spring-boot-starter-bigcommerce-app)
+
+## Reference
+
+- [BigCommerce App Guide](https://developer.bigcommerce.com/api-docs/apps/guide/intro)
+- [Spring Boot](https://spring.io/projects/spring-boot)
 
 ## How To Use
 
@@ -34,6 +39,8 @@ Upon Spring Boot start-up, the following endpoints will be automatically registe
 
 ## Configuration
 
+This section below allows you to configure this module according to the settings used during your app registration via BigCommerce (see [BigCommerce App Portal](https://devtools.bigcommerce.com/my/apps)).
+
 ```yaml
 caas:
   bigcommerce:
@@ -43,7 +50,7 @@ caas:
       - scope-1
       - scope-2
 
-    redirect-uri: 'https:/a/redirect/uri'                   // 
+    redirect-uri: 'https:/a/redirect/uri'                   // callback redirect-uri (declared during app commerce app registration)
 
     store-credentials:                                      // store credentials used to fetch oauth token on 'installation' of this app 
       store-id:

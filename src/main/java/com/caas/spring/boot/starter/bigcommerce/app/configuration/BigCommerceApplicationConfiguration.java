@@ -17,8 +17,8 @@ public class BigCommerceApplicationConfiguration {
     private List<String> requiredScopes;
     private String redirectUri;
     private Map<String, StoreCredentials> storeCredentials;
-    private HttpClientConfiguration httpClient;
-    private HtmlConfiguration html;
+    private HttpClientConfiguration httpClient = new HttpClientConfiguration();
+    private HtmlConfiguration html = new HtmlConfiguration();
 
     public URI getBigCommerceUri() throws URISyntaxException {
         return new URI(url);

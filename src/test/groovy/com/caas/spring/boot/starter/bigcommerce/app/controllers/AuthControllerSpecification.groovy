@@ -1,17 +1,17 @@
 package com.caas.spring.boot.starter.bigcommerce.app.controllers
 
-import com.caas.spring.boot.starter.bigcommerce.app.AuthTokenRepository
-import com.caas.spring.boot.starter.bigcommerce.app.AuthorizationFlowController
+import com.caas.spring.boot.starter.bigcommerce.app.AuthToken
+import com.caas.spring.boot.starter.bigcommerce.app.TokenRepository
+import com.caas.spring.boot.starter.bigcommerce.app.TokenService
 import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceAppException
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration
-import com.caas.spring.boot.starter.bigcommerce.app.model.AuthToken
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
 import spock.lang.Specification
 
 class AuthControllerSpecification extends Specification {
 
     AuthController testObj
-    AuthorizationFlowController authorizationFlowController = Mock()
-    AuthTokenRepository authTokenStorage = Mock()
+    TokenService authorizationFlowController = Mock()
+    TokenRepository authTokenStorage = Mock()
     BigCommerceApplicationConfiguration configuration = Mock()
 
     void setup() {
@@ -53,7 +53,7 @@ class AuthControllerSpecification extends Specification {
 
         and:
         def token = Mock(AuthToken)
-        authorizationFlowController.authenticate(*_) >> token
+        authorizationFlowController.fetchFor(*_) >> token
 
         when:
         testObj.authenticate("code", "a b", "a-store")

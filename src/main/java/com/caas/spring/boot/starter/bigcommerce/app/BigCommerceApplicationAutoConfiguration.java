@@ -1,58 +1,57 @@
 package com.caas.spring.boot.starter.bigcommerce.app;
 
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration;
 import com.caas.spring.boot.starter.bigcommerce.app.controllers.AuthController;
 import com.caas.spring.boot.starter.bigcommerce.app.controllers.LoadController;
 import com.caas.spring.boot.starter.bigcommerce.app.controllers.UninstallController;
-import com.caas.spring.boot.starter.bigcommerce.app.integrations.BigCommerceClient;
+import com.caas.spring.boot.starter.bigcommerce.app.integrations.BigCommerceAuthorizationFlowClient;
 import com.caas.spring.boot.starter.bigcommerce.app.integrations.InMemoryAuthTokenRepository;
 import com.caas.spring.boot.starter.bigcommerce.app.integrations.http.DefaultHttpClientFactory;
-import com.caas.spring.boot.starter.bigcommerce.app.security.DefaultApiCredentialProvider;
 import com.caas.spring.boot.starter.bigcommerce.app.security.DefaultSignedPayloadReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+@Slf4j
 @Configuration
 @EnableConfigurationProperties(BigCommerceApplicationConfiguration.class)
 public class BigCommerceApplicationAutoConfiguration {
+
+    private static final String LOAD = "load";
 
     @Bean
     public LoadController registerLoadController(RequestMappingHandlerMapping handlerMapping, SignedPayloadReader signedPayloadReader, BigCommerceApplicationConfiguration configuration) throws NoSuchMethodException {
         LoadController loadController = new LoadController(signedPayloadReader, configuration);
 
         handlerMapping.registerMapping(
-                RequestMappingInfo.paths("/load")
+                RequestMappingInfo.paths(String.format("/%s", LOAD))
                         .methods(RequestMethod.GET)
                         .produces(MediaType.TEXT_HTML_VALUE)
                         .build(),
                 loadController,
-                loadController.getClass().getMethod("load", String.class));
+                loadController.getClass().getMethod(LOAD, String.class));
 
         return loadController;
     }
 
     @Bean
     @ConditionalOnMissingBean(RequestMappingHandlerMapping.class)
-    RequestMappingHandlerMapping handlerMapping() {
-        throw new InvalidConfigurationException("missing request handler mapping");
+    public RequestMappingHandlerMapping handlerMapping() {
+        throw new RuntimeException("Spring RequestMappingHandlerMapping must be present on the application context but is missing...");
     }
 
     @Bean
-    @ConditionalOnMissingBean(ObjectMapper.class)
-    ObjectMapper objectMapper() {
-        throw new InvalidConfigurationException("missing object mapper");
-    }
-
-    @Bean
-    public AuthController registerAuthController(RequestMappingHandlerMapping handlerMapping, AuthorizationFlowController authorizationFlowController, BigCommerceApplicationConfiguration bigCommerceAppConfiguration, AuthTokenRepository authTokenRepository) throws NoSuchMethodException {
-        AuthController authController = new AuthController(authorizationFlowController, bigCommerceAppConfiguration, authTokenRepository);
+    public AuthController registerAuthController(RequestMappingHandlerMapping handlerMapping, TokenService<AuthToken> tokenService, BigCommerceApplicationConfiguration bigCommerceAppConfiguration, TokenRepository<AuthToken> tokenRepository) throws NoSuchMethodException {
+        AuthController authController = new AuthController(tokenService, bigCommerceAppConfiguration, tokenRepository);
 
         handlerMapping.registerMapping(
                 RequestMappingInfo.paths("/auth")
@@ -66,8 +65,19 @@ public class BigCommerceApplicationAutoConfiguration {
     }
 
     @Bean
-    public UninstallController uninstallController(RequestMappingHandlerMapping handlerMapping, SignedPayloadReader signedPayloadReader, AuthTokenRepository authTokenRepository) throws NoSuchMethodException {
-        UninstallController uninstallController = new UninstallController(signedPayloadReader, authTokenRepository);
+    @ConditionalOnMissingBean(ObjectMapper.class)
+    public ObjectMapper objectMapper() {
+        log.warn("using BigCommerce Spring Boot starter app default object mapper as none supplied in project.");
+
+        return new Jackson2ObjectMapperBuilder()
+                .indentOutput(true)
+                .propertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE)
+                .build();
+    }
+
+    @Bean
+    public UninstallController uninstallController(RequestMappingHandlerMapping handlerMapping, SignedPayloadReader signedPayloadReader, TokenRepository<AuthToken> tokenRepository) throws NoSuchMethodException {
+        UninstallController uninstallController = new UninstallController(signedPayloadReader, tokenRepository);
 
         handlerMapping.registerMapping(
                 RequestMappingInfo.paths("/uninstall")
@@ -81,9 +91,9 @@ public class BigCommerceApplicationAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = { AuthorizationFlowController.class })
-    public AuthorizationFlowController authorizationFlowController(BigCommerceApplicationConfiguration configuration, ObjectMapper objectMapper, HttpClientFactory httpClientFactory) {
-        return new BigCommerceClient(configuration, objectMapper, httpClientFactory);
+    @ConditionalOnMissingBean(value = { TokenService.class })
+    public TokenService<AuthToken> authorizationFlowController(BigCommerceApplicationConfiguration configuration, ObjectMapper objectMapper, HttpClientFactory httpClientFactory) {
+        return new BigCommerceAuthorizationFlowClient(configuration, objectMapper, httpClientFactory);
     }
 
     @Bean
@@ -93,8 +103,8 @@ public class BigCommerceApplicationAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = { AuthTokenRepository.class })
-    public AuthTokenRepository authStorage() {
+    @ConditionalOnMissingBean(value = { TokenRepository.class })
+    public TokenRepository<AuthToken> authStorage() {
         return new InMemoryAuthTokenRepository();
     }
 
@@ -102,12 +112,6 @@ public class BigCommerceApplicationAutoConfiguration {
     @ConditionalOnMissingBean(value = { SignedPayloadReader.class })
     public SignedPayloadReader signedPayloadVerifier(BigCommerceApplicationConfiguration configuration, ObjectMapper objectMapper) {
         return new DefaultSignedPayloadReader(configuration, objectMapper);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(value = { ApiCredentialProvider.class })
-    public ApiCredentialProvider apiCredentialProvider(BigCommerceApplicationConfiguration configuration, AuthTokenRepository authTokenRepository) {
-        return new DefaultApiCredentialProvider(configuration, authTokenRepository);
     }
 
 }

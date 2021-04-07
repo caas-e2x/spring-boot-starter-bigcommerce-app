@@ -1,11 +1,12 @@
 package com.caas.spring.boot.starter.bigcommerce.app.integrations;
 
-import com.caas.spring.boot.starter.bigcommerce.app.AuthorizationFlowController;
+import com.caas.spring.boot.starter.bigcommerce.app.TokenService;
 import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceAppException;
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration;
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration;
 import com.caas.spring.boot.starter.bigcommerce.app.HttpClientFactory;
-import com.caas.spring.boot.starter.bigcommerce.app.model.AuthToken;
+import com.caas.spring.boot.starter.bigcommerce.app.AuthToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpHeaders;
@@ -21,20 +22,20 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Slf4j
-public class BigCommerceClient implements AuthorizationFlowController {
+public class BigCommerceAuthorizationFlowClient implements TokenService<AuthToken> {
 
-    private final BigCommerceApplicationConfiguration bigCommerceAppConfiguration;
+    private final BigCommerceApplicationConfiguration configuration;
     private final ObjectMapper objectMapper;
     private final HttpClientFactory httpClientFactory;
 
-    public BigCommerceClient(BigCommerceApplicationConfiguration bigCommerceAppConfiguration, ObjectMapper objectMapper, HttpClientFactory httpClientFactory) {
-        this.bigCommerceAppConfiguration = bigCommerceAppConfiguration;
+    public BigCommerceAuthorizationFlowClient(BigCommerceApplicationConfiguration bigCommerceAppConfiguration, ObjectMapper objectMapper, HttpClientFactory httpClientFactory) {
+        this.configuration = bigCommerceAppConfiguration;
         this.objectMapper = objectMapper;
         this.httpClientFactory = httpClientFactory;
     }
 
     @Override
-    public AuthToken authenticate(String code, String storeHash, List<String> requiredScopes) {
+    public AuthToken fetchFor(String code, String storeHash, List<String> requiredScopes) {
         String bodyAsString = getRequestBody(code, requiredScopes, storeHash);
         HttpRequest request = getHttpRequest(bodyAsString);
 
@@ -45,8 +46,10 @@ public class BigCommerceClient implements AuthorizationFlowController {
         try {
             HttpResponse<String> response = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            log.debug("status: " + response.statusCode());
-            log.debug("received: " + response.body());
+            if (log.isDebugEnabled()) {
+                log.debug("status: " + response.statusCode());
+                log.debug("received: " + response.body());
+            }
 
             if (response.statusCode() < 200 || response.statusCode() > 399) {
                 throw new BigCommerceAppException("invalid big commerce authentication request: " + response.body());
@@ -59,7 +62,7 @@ public class BigCommerceClient implements AuthorizationFlowController {
     }
 
     private HttpClient getHttpClient() {
-        val connectionTimeout = bigCommerceAppConfiguration.getHttpClientConnectTimeout();
+        val connectionTimeout = configuration.getHttpClientConnectTimeout();
 
         return httpClientFactory.createFor(b -> b.connectTimeout(Duration.of(connectionTimeout, ChronoUnit.MILLIS)));
     }
@@ -68,18 +71,19 @@ public class BigCommerceClient implements AuthorizationFlowController {
         try {
             return HttpRequest
                     .newBuilder()
-                    .uri(bigCommerceAppConfiguration.getBigCommerceUri())
+                    .uri(configuration.getBigCommerceUri())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                    .timeout(Duration.of(bigCommerceAppConfiguration.getHttpClientReadTimeout(), ChronoUnit.MILLIS))
+                    .timeout(Duration.of(configuration.getHttpClientReadTimeout(), ChronoUnit.MILLIS))
                     .POST(HttpRequest.BodyPublishers.ofString(bodyAsString))
                     .build();
+
         } catch (URISyntaxException e) {
             throw new BigCommerceAppException("failed to process BigCommerce registration request", e);
         }
     }
 
     private String getRequestBody(String code, List<String> scopes, String storeHash) {
-        val storeConfiguration = bigCommerceAppConfiguration.getStoreCredentialsFor(storeHash);
+        val storeConfiguration = configuration.getStoreCredentialsFor(storeHash);
 
         val bodyAsString = "client_id=" +
                 storeConfiguration.getClientId() +
@@ -91,12 +95,22 @@ public class BigCommerceClient implements AuthorizationFlowController {
                 String.join(" ", scopes) +
                 "&grant_type=authorization_code" +
                 "&redirect_uri=" +
-                bigCommerceAppConfiguration.getRedirectUri() +
+                configuration.getRedirectUri() +
                 "&context=stores/" +
                 storeHash;
 
-        log.debug("auth request sent with: " + bodyAsString);
+        if (log.isDebugEnabled()) {
+            log.debug("auth request sent with: " + stripSecretFrom(bodyAsString, storeConfiguration.getClientSecret()));
+        }
 
         return bodyAsString;
+    }
+
+    private String stripSecretFrom(String value, String valueToStrip) {
+        if (Strings.isNullOrEmpty(value) || Strings.isNullOrEmpty(valueToStrip)) {
+            return value;
+        }
+
+        return value.replace(valueToStrip, "***");
     }
 }

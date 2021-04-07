@@ -1,5 +1,6 @@
 package com.caas.spring.boot.starter.bigcommerce.app
 
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -7,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 @ActiveProfiles('config')
-@SpringBootTest(classes = BigCommerceApplicationAutoConfiguration)
+@SpringBootTest(classes = BigCommerceApplicationStarterAppConfiguration)
 class BigCommerceApplicationAutoConfigurationSpecification extends Specification {
 
     @Autowired
@@ -20,12 +21,9 @@ class BigCommerceApplicationAutoConfigurationSpecification extends Specification
 
     void 'configuration for spring boot starter bigcommerce app loads'() {
         given:
-        def configuration = context.getBean(BigCommerceApplicationConfiguration)
+        BigCommerceApplicationConfiguration configuration = context.getBean(BigCommerceApplicationConfiguration)
 
         expect:
         configuration
-
-        and:
-        configuration.name
     }
 }

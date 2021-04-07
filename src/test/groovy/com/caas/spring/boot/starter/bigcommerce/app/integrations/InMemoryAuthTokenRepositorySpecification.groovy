@@ -1,6 +1,6 @@
 package com.caas.spring.boot.starter.bigcommerce.app.integrations
 
-import com.caas.spring.boot.starter.bigcommerce.app.model.AuthToken
+import com.caas.spring.boot.starter.bigcommerce.app.AuthToken
 import spock.lang.Specification
 
 class InMemoryAuthTokenRepositorySpecification extends Specification {
@@ -53,7 +53,7 @@ class InMemoryAuthTokenRepositorySpecification extends Specification {
         result == otherToken
 
         when:
-        testObj.deleteAllFor(storeHash)
+        testObj.deleteFor(storeHash)
 
         and:
         result = testObj.getBy(storeHash)

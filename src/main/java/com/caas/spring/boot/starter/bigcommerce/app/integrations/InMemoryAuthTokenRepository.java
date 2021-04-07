@@ -1,26 +1,26 @@
 package com.caas.spring.boot.starter.bigcommerce.app.integrations;
 
-import com.caas.spring.boot.starter.bigcommerce.app.AuthTokenRepository;
-import com.caas.spring.boot.starter.bigcommerce.app.model.AuthToken;
+import com.caas.spring.boot.starter.bigcommerce.app.TokenRepository;
+import com.caas.spring.boot.starter.bigcommerce.app.AuthToken;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryAuthTokenRepository implements AuthTokenRepository {
+public class InMemoryAuthTokenRepository implements TokenRepository<AuthToken> {
     private final Map<String, AuthToken> authTokenMap = new ConcurrentHashMap<>();
 
     @Override
-    public void save(String storeHash, AuthToken authToken) {
-        authTokenMap.put(storeHash, authToken);
+    public void save(String id, AuthToken token) {
+        authTokenMap.put(id, token);
     }
 
     @Override
-    public AuthToken getBy(String storeHash) {
-        return authTokenMap.get(storeHash);
+    public AuthToken getBy(String id) {
+        return authTokenMap.get(id);
     }
 
     @Override
-    public void deleteAllFor(String storeHash) {
-        authTokenMap.remove(storeHash);
+    public void deleteFor(String id) {
+        authTokenMap.remove(id);
     }
 }

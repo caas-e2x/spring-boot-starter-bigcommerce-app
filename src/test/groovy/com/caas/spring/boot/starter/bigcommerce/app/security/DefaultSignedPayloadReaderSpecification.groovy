@@ -1,11 +1,11 @@
 package com.caas.spring.boot.starter.bigcommerce.app.security
 
 import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceAppException
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration
-import com.caas.spring.boot.starter.bigcommerce.app.StoreCredentials
-import com.caas.spring.boot.starter.bigcommerce.app.model.Owner
-import com.caas.spring.boot.starter.bigcommerce.app.model.SignedPayload
-import com.caas.spring.boot.starter.bigcommerce.app.model.User
+import com.caas.spring.boot.starter.bigcommerce.app.Owner
+import com.caas.spring.boot.starter.bigcommerce.app.SignedPayload
+import com.caas.spring.boot.starter.bigcommerce.app.User
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.StoreCredentials
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Charsets
 import spock.lang.Specification

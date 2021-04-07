@@ -1,18 +1,18 @@
 package com.caas.spring.boot.starter.bigcommerce.app.integrations
 
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration
-import com.caas.spring.boot.starter.bigcommerce.app.HttpClientConfiguration
-import com.caas.spring.boot.starter.bigcommerce.app.StoreCredentials
+import com.caas.spring.boot.starter.bigcommerce.app.AuthToken
+import com.caas.spring.boot.starter.bigcommerce.app.User
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.HttpClientConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.StoreCredentials
 import com.caas.spring.boot.starter.bigcommerce.app.integrations.http.DefaultHttpClientFactory
-import com.caas.spring.boot.starter.bigcommerce.app.model.AuthToken
-import com.caas.spring.boot.starter.bigcommerce.app.model.User
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*
 
-class BigCommerceClientStubbedSpecification extends WiremockSpecification {
+class BigCommerceAuthorizationFlowClientStubbedSpecification extends WiremockSpecification {
 
-    BigCommerceClient testObj
+    BigCommerceAuthorizationFlowClient testObj
     BigCommerceApplicationConfiguration configuration = new BigCommerceApplicationConfiguration()
 
     void setup() {
@@ -22,7 +22,7 @@ class BigCommerceClientStubbedSpecification extends WiremockSpecification {
 
         ObjectMapper objectMapper = new ObjectMapper()
 
-        testObj = new BigCommerceClient(configuration, objectMapper, new DefaultHttpClientFactory())
+        testObj = new BigCommerceAuthorizationFlowClient(configuration, objectMapper, new DefaultHttpClientFactory())
     }
 
     void "when big commerce token endpoint request is successful it should return an auth response with the relevant information"() {
@@ -44,7 +44,7 @@ class BigCommerceClientStubbedSpecification extends WiremockSpecification {
                         }""")))
 
         when:
-        def response = testObj.authenticate("a-code", "store-hash", ["scope1", "scope2"])
+        def response = testObj.fetchFor("a-code", "store-hash", ["scope1", "scope2"])
 
         then:
         response == expectedResult

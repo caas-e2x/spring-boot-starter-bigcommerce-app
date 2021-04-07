@@ -1,8 +1,8 @@
 package com.caas.spring.boot.starter.bigcommerce.app.controllers
 
-import com.caas.spring.boot.starter.bigcommerce.app.AuthTokenRepository
+import com.caas.spring.boot.starter.bigcommerce.app.SignedPayload
+import com.caas.spring.boot.starter.bigcommerce.app.TokenRepository
 import com.caas.spring.boot.starter.bigcommerce.app.SignedPayloadReader
-import com.caas.spring.boot.starter.bigcommerce.app.model.SignedPayload
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
@@ -11,7 +11,7 @@ class UninstallControllerSpecification extends Specification {
     UninstallController testObj
 
     SignedPayloadReader signedPayloadReader = Mock()
-    AuthTokenRepository authTokenRepository = Mock()
+    TokenRepository authTokenRepository = Mock()
 
     void setup() {
         testObj = new UninstallController(signedPayloadReader, authTokenRepository)
@@ -32,6 +32,6 @@ class UninstallControllerSpecification extends Specification {
         result.statusCode == HttpStatus.OK
 
         and:
-        1 * authTokenRepository.deleteAllFor(storeHash)
+        1 * authTokenRepository.deleteFor(storeHash)
     }
 }

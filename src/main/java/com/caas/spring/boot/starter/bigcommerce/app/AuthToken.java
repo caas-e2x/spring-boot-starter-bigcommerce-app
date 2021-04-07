@@ -1,4 +1,4 @@
-package com.caas.spring.boot.starter.bigcommerce.app.model;
+package com.caas.spring.boot.starter.bigcommerce.app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -1,9 +1,9 @@
 package com.caas.spring.boot.starter.bigcommerce.app.security;
 
 import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceAppException;
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration;
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration;
 import com.caas.spring.boot.starter.bigcommerce.app.SignedPayloadReader;
-import com.caas.spring.boot.starter.bigcommerce.app.model.SignedPayload;
+import com.caas.spring.boot.starter.bigcommerce.app.SignedPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;

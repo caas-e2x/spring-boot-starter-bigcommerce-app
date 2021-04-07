@@ -1,4 +1,4 @@
-package com.caas.spring.boot.starter.bigcommerce.app;
+package com.caas.spring.boot.starter.bigcommerce.app.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,14 +13,10 @@ import java.util.Map;
 @Getter
 @ConfigurationProperties(prefix="caas.bigcommerce")
 public class BigCommerceApplicationConfiguration {
-    private BigCommerceApplicationType applicationType = BigCommerceApplicationType.APP;
-
     private String url = "https://login.bigcommerce.com/oauth2/token";
     private List<String> requiredScopes;
     private String redirectUri;
-
     private Map<String, StoreCredentials> storeCredentials;
-
     private HttpClientConfiguration httpClient;
     private HtmlConfiguration html;
 
@@ -29,11 +25,11 @@ public class BigCommerceApplicationConfiguration {
     }
 
     public String getAuthenticatedHtml() {
-        return getHtml().getAuthenticatedHtml();
+        return html.getAuthenticatedHtml();
     }
 
     public String getLoadedHtml() {
-        return getHtml().getLoadedHtml();
+        return html.getLoadedHtml();
     }
 
     public StoreCredentials getStoreCredentialsFor(String storeHash) {

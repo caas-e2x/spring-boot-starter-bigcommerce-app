@@ -1,6 +1,6 @@
 package com.caas.spring.boot.starter.bigcommerce.app.controllers
 
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
 import com.caas.spring.boot.starter.bigcommerce.app.SignedPayloadReader
 import spock.lang.Specification
 

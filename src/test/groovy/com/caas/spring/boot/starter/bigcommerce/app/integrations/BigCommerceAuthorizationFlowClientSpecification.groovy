@@ -1,19 +1,19 @@
 package com.caas.spring.boot.starter.bigcommerce.app.integrations
 
 import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceAppException
-import com.caas.spring.boot.starter.bigcommerce.app.BigCommerceApplicationConfiguration
-import com.caas.spring.boot.starter.bigcommerce.app.HttpClientConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.BigCommerceApplicationConfiguration
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.HttpClientConfiguration
 import com.caas.spring.boot.starter.bigcommerce.app.HttpClientFactory
-import com.caas.spring.boot.starter.bigcommerce.app.StoreCredentials
+import com.caas.spring.boot.starter.bigcommerce.app.configuration.StoreCredentials
 import com.fasterxml.jackson.databind.ObjectMapper
 import spock.lang.Specification
 
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
 
-class BigCommerceClientSpecification extends Specification {
+class BigCommerceAuthorizationFlowClientSpecification extends Specification {
 
-    BigCommerceClient testObj
+    BigCommerceAuthorizationFlowClient testObj
     BigCommerceApplicationConfiguration configuration = new BigCommerceApplicationConfiguration()
     HttpClientFactory httpClientFactoryMock = Mock()
 
@@ -24,7 +24,7 @@ class BigCommerceClientSpecification extends Specification {
 
         ObjectMapper objectMapper = new ObjectMapper()
 
-        testObj = new BigCommerceClient(configuration, objectMapper, httpClientFactoryMock)
+        testObj = new BigCommerceAuthorizationFlowClient(configuration, objectMapper, httpClientFactoryMock)
     }
 
     void "it should throw an exception if status code is #statusCode"() {
@@ -40,7 +40,7 @@ class BigCommerceClientSpecification extends Specification {
         httpClientFactoryMock.createFor(_) >> httpClient
 
         when:
-        testObj.authenticate("a-code", "store-hash", ["scope1", "scope2"])
+        testObj.fetchFor("a-code", "store-hash", ["scope1", "scope2"])
 
         then:
         thrown(BigCommerceAppException)
@@ -63,7 +63,7 @@ class BigCommerceClientSpecification extends Specification {
         httpClientFactoryMock.createFor(_) >> httpClient
 
         when:
-        testObj.authenticate("a-code", "store-hash", ["scope1", "scope2"])
+        testObj.fetchFor("a-code", "store-hash", ["scope1", "scope2"])
 
         then:
         noExceptionThrown()

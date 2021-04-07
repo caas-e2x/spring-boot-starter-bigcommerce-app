@@ -1,5 +1,6 @@
 package com.caas.spring.boot.starter.bigcommerce.app.configuration;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

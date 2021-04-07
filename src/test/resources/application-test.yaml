@@ -1,0 +1,23 @@
+caas:
+  bigcommerce:
+    url: 'https://a/login/url'
+
+    required-scopes:
+      - scope-1
+      - scope-2
+
+    redirect-uri: 'https:/a/redirect/uri'
+
+    store-credentials:
+      storeid:
+        key: a-store-key
+        client-id: a-client-id
+        client-secret: a-client-secret
+
+    http-client:
+      read-timeout: 10000
+      connect-timeout: 1000
+
+    html:
+      authenticated-html: /path/to/html
+      loaded-html: /path/to/html

@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
-@ActiveProfiles('config')
+@ActiveProfiles('test')
 @SpringBootTest(classes = BigCommerceApplicationStarterAppConfiguration)
 class BigCommerceApplicationAutoConfigurationSpecification extends Specification {
 
@@ -25,5 +25,25 @@ class BigCommerceApplicationAutoConfigurationSpecification extends Specification
 
         expect:
         configuration
+
+        and:
+        configuration.url == 'https://a/login/url'
+        configuration.requiredScopes == ['scope-1', 'scope-2']
+        configuration.redirectUri == 'https:/a/redirect/uri'
+
+        and:
+        configuration.storeCredentials
+        configuration.storeCredentials['storeid']
+        configuration.storeCredentials['storeid'].key == 'a-store-key'
+        configuration.storeCredentials['storeid'].clientId == 'a-client-id'
+        configuration.storeCredentials['storeid'].clientSecret == 'a-client-secret'
+
+        and:
+        configuration.httpClient.readTimeout == 10000
+        configuration.httpClient.connectTimeout == 1000
+
+        and:
+        configuration.authenticatedHtml == '/path/to/html'
+        configuration.loadedHtml == '/path/to/html'
     }
 }

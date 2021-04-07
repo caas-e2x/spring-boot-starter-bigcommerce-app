@@ -4,7 +4,7 @@ plugins {
     id 'groovy'
 }
 
-group = 'com.caas'
+group = 'caas.e2x.bigcommerce'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 

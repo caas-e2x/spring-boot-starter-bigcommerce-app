@@ -2,7 +2,7 @@
 
 A Spring Boot Starter module for BigCommerce third-party applications 
 
-[![Build](https://circleci.com/gh/caas-e2x/spring-boot-starter-bigcommerce-app.svg??style=shield)](https://app.circleci.com/pipelines/github/caas-e2x/spring-boot-starter-bigcommerce-app)
+![Build](https://github.com/caas-e2x-org/spring-boot-starter-bigcommerce-app/actions/workflows/gradle.yml/badge.svg)
 
 ## Reference
 
